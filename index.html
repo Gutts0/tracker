@@ -1,0 +1,410 @@
+CTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tracker">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#09090b">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23ea580c' rx='40'/%3E%3Ctext x='50%25' y='58%25' font-family='Arial Black' font-size='110' font-weight='900' fill='white' text-anchor='middle'%3EIV%3C/text%3E%3C/svg%3E">
+<title>Anime Physique Tracker · Grade IV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overscroll-behavior-y: contain; }
+body { font-family: 'Outfit', system-ui, -apple-system, sans-serif; background: #09090b; color: #f4f4f5; font-size: 14px; line-height: 1.5; padding-bottom: env(safe-area-inset-bottom); -webkit-font-smoothing: antialiased; }
+.display { font-family: 'Big Shoulders Display', 'Arial Black', sans-serif; letter-spacing: 0.02em; }
+button, a { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; text-decoration: none; }
+input { font-family: inherit; }
+
+.header { position: relative; padding: calc(40px + env(safe-area-inset-top)) 20px 24px; border-bottom: 1px solid #27272a; overflow: hidden; }
+.header-glow { position: absolute; inset: 0; background: radial-gradient(ellipse at top right, rgba(234,88,12,0.25), transparent 60%); animation: pulse 2.5s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+.grade-tag { position: relative; font-size: 10px; letter-spacing: 0.4em; color: #f97316; font-weight: 700; margin-bottom: 8px; }
+.title { position: relative; font-size: 36px; font-weight: 900; line-height: 0.9; margin-bottom: 20px; }
+.stats-row { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.progress-num { font-size: 60px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+.progress-num span { font-size: 30px; color: #3f3f46; }
+.progress-label { font-size: 10px; letter-spacing: 0.3em; color: #71717a; margin-top: 8px; font-weight: 500; }
+.header-actions { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.icon-btn { font-size: 12px; color: #71717a; display: inline-flex; align-items: center; gap: 5px; padding: 6px 2px; transition: color .2s; }
+.icon-btn:active, .icon-btn:hover { color: #d4d4d8; }
+.icon-btn.primary { color: #f97316; font-weight: 500; }
+.progress-bar { position: relative; margin-top: 16px; height: 3px; background: #18181b; border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; transition: width 0.7s; background: linear-gradient(90deg, #ea580c, #f97316, #ef4444); }
+.save-status { position: relative; margin-top: 12px; font-size: 10px; letter-spacing: 0.2em; font-weight: 500; color: #f97316; opacity: 0; transition: opacity .3s; }
+.save-status.visible { opacity: 1; }
+
+.tabs { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: repeat(3, 1fr); background: rgba(9,9,11,0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid #27272a; }
+.tab { padding: 16px 0; text-align: center; color: #52525b; transition: color 0.2s; position: relative; }
+.tab.active { color: #f4f4f5; }
+.tab .tab-day { font-size: 9px; letter-spacing: 0.3em; opacity: 0.7; font-weight: 500; }
+.tab .tab-title { font-size: 22px; font-weight: 700; margin-top: 2px; }
+.tab .tab-progress { font-size: 10px; opacity: 0.6; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tab.active::after { content: ''; position: absolute; bottom: 0; left: 25%; right: 25%; height: 2px; background: #f97316; }
+
+.exercises { padding: 24px 20px 80px; }
+.day-subtitle { font-size: 10px; letter-spacing: 0.3em; color: #71717a; margin-bottom: 12px; font-weight: 500; }
+
+.card { background: rgba(24,24,27,0.6); border: 1px solid #27272a; border-radius: 12px; padding: 16px; margin-bottom: 10px; transition: all 0.3s; }
+.card.graduated { background: linear-gradient(135deg, rgba(124,45,18,0.4), #18181b); border-color: rgba(249,115,22,0.4); }
+.card-header { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.card-title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.card-title { font-weight: 600; line-height: 1.2; }
+.grad-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; letter-spacing: 0.15em; font-weight: 700; color: #fb923c; background: rgba(249,115,22,0.1); padding: 2px 6px; border-radius: 4px; }
+.card-target { font-size: 12px; color: #71717a; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.card-target span { color: #d4d4d8; }
+.play-btn { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: #27272a; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.play-btn:active, .play-btn:hover { background: #ea580c; }
+.play-btn svg { width: 14px; height: 14px; fill: #d4d4d8; }
+.play-btn:active svg, .play-btn:hover svg { fill: white; }
+.card-progress-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.card-progress-bar { flex: 1; height: 6px; background: #27272a; border-radius: 999px; overflow: hidden; }
+.card-progress-fill { height: 100%; transition: width 0.5s; background: #71717a; }
+.card.graduated .card-progress-fill { background: #f97316; }
+.progress-pct { font-size: 10px; color: #71717a; width: 40px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+
+.history-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; font-size: 10px; letter-spacing: 0.2em; font-weight: 500; color: #71717a; margin-top: 12px; padding: 4px 0; }
+.history-items { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.history-item { display: flex; justify-content: space-between; font-size: 11px; padding: 6px 10px; border-radius: 4px; font-family: 'Courier New', monospace; background: rgba(39,39,42,0.6); color: #a1a1aa; font-variant-numeric: tabular-nums; }
+.history-item.hit { background: rgba(249,115,22,0.1); color: #fdba74; }
+
+.grad-callout { margin-top: 12px; padding: 12px; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.2); border-radius: 8px; }
+.grad-callout-tag { font-size: 9px; letter-spacing: 0.3em; color: #fb923c; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+.grad-callout-text { font-size: 14px; color: #e4e4e7; line-height: 1.3; }
+.grad-callout-text strong { color: #fdba74; }
+
+.log-btn { width: 100%; padding: 10px; margin-top: 12px; background: #27272a; border-radius: 8px; font-size: 14px; font-weight: 500; color: #e4e4e7; transition: background 0.2s; }
+.log-btn:active, .log-btn:hover { background: #3f3f46; }
+.log-form { margin-top: 12px; padding: 12px; background: #09090b; border: 1px solid #3f3f46; border-radius: 8px; }
+.log-form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.log-form-label { font-size: 10px; letter-spacing: 0.2em; color: #71717a; font-weight: 500; }
+.log-close { color: #71717a; padding: 4px; }
+.log-inputs { display: grid; gap: 8px; margin-bottom: 12px; }
+.log-input-wrap { position: relative; }
+.log-input-label { position: absolute; top: 4px; left: 8px; font-size: 9px; letter-spacing: 0.2em; color: #52525b; font-weight: 500; pointer-events: none; }
+.log-input { width: 100%; background: #18181b; border: 1px solid #3f3f46; border-radius: 6px; padding: 18px 4px 6px; text-align: center; font-size: 16px; font-weight: 600; color: #f4f4f5; font-variant-numeric: tabular-nums; outline: none; transition: border-color 0.2s; }
+.log-input:focus { border-color: #f97316; }
+.save-btn { width: 100%; padding: 10px; background: #ea580c; border-radius: 6px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; color: white; }
+.save-btn:active:not(:disabled), .save-btn:hover:not(:disabled) { background: #f97316; }
+.save-btn:disabled { background: #27272a; color: #52525b; cursor: not-allowed; }
+
+.footer { padding: 24px 20px; border-top: 1px solid #18181b; text-align: center; }
+.footer p { font-size: 11px; color: #52525b; line-height: 1.5; }
+.footer p .highlight { color: rgba(249,115,22,0.8); }
+
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+.modal { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; max-width: 380px; width: 100%; max-height: calc(100vh - 40px); overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+.modal-title { font-size: 24px; font-weight: 700; }
+.modal-close { color: #71717a; padding: 4px; }
+.modal-text { font-size: 13px; color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+.modal-text .accent { color: #fb923c; font-weight: 600; }
+.modal-text .danger { color: #f87171; }
+.modal-actions { display: flex; gap: 8px; }
+.modal-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+.modal-btn.secondary { background: #27272a; color: #e4e4e7; }
+.modal-btn.danger { background: #dc2626; color: white; font-weight: 600; }
+.modal-btn.primary { background: #ea580c; color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.modal-textarea { width: 100%; height: 130px; background: #09090b; border: 1px solid #27272a; border-radius: 8px; padding: 12px; font-size: 11px; font-family: 'Courier New', monospace; color: #d4d4d8; resize: none; outline: none; }
+.modal-textarea:focus { border-color: #f97316; }
+.modal-error { font-size: 12px; color: #f87171; margin-top: 8px; }
+
+.icon { display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// === DATA ===
+const STORAGE_KEY = 'anime-tracker-v1';
+const VIDEO_ID = '7RO-Fr6cXJs';
+
+const EXERCISES = [
+{ id: 'plank-d1', day: 1, name: 'Straight-arm Plank', type: 'time', target: 60, sets: 3, timestamp: 30, next: 'Incline push-ups (lower surface)' },
+{ id: 'pike-d1', day: 1, name: 'Pike Hold', type: 'time', target: 30, sets: 3, timestamp: 60, next: 'Incline pike push-ups' },
+{ id: 'incline-d1', day: 1, name: 'Incline Push-ups (high surface)', type: 'reps', target: 12, sets: 3, timestamp: 300, next: 'Lower the surface, then full push-ups' },
+{ id: 'sideplank-d1', day: 1, name: 'Side Plank (per side)', type: 'time', target: 30, sets: 2, timestamp: 30, next: 'Side plank with leg lift' },
+{ id: 'deadhang-d2', day: 2, name: 'Dead Hang', type: 'time', target: 30, sets: 3, timestamp: 150, next: 'Active hang' },
+{ id: 'activehang-d2', day: 2, name: 'Active Hang', type: 'time', target: 30, sets: 3, timestamp: 180, next: 'Scapular shrugs' },
+{ id: 'scapshrug-d2', day: 2, name: 'Scapular Shrugs', type: 'reps', target: 10, sets: 3, timestamp: 240, next: 'Inverted rows' },
+{ id: 'boxsquat-d3', day: 3, name: 'Box Squat', type: 'reps', target: 15, sets: 3, timestamp: 120, next: 'Bodyweight squat' },
+{ id: 'bwsquat-d3', day: 3, name: 'Bodyweight Squat', type: 'reps', target: 20, sets: 3, timestamp: 90, next: 'Lunges' },
+{ id: 'plankcore-d3', day: 3, name: 'Straight-arm Plank (finisher)', type: 'time', target: 45, sets: 2, timestamp: 30, next: 'Hollow body hold' },
+];
+const DAY_META = {
+1: { title: 'PUSH', subtitle: 'Chest · Shoulders · Core' },
+2: { title: 'PULL', subtitle: 'Back · Grip' },
+3: { title: 'LEGS', subtitle: 'Quads · Glutes · Core' },
+};
+
+// === STATE ===
+let state = { sessions: {}, activeDay: 1, loggingId: null, historyOpen: {}, modal: null, importText: '', importError: '', saveFlash: false };
+
+// === STORAGE (real localStorage – works because we're outside the artifact!) ===
+function loadData() {
+try {
+const raw = localStorage.getItem(STORAGE_KEY);
+if (raw) state.sessions = JSON.parse(raw) || {};
+} catch (e) { console.warn('load failed', e); }
+}
+function saveData() {
+try {
+localStorage.setItem(STORAGE_KEY, JSON.stringify(state.sessions));
+flashSaved();
+} catch (e) { console.error('save failed', e); alert('Save failed. Storage may be full or disabled.'); }
+}
+function flashSaved() {
+state.saveFlash = true;
+const el = document.getElementById('save-status');
+if (el) { el.classList.add('visible'); setTimeout(() => el.classList.remove('visible'), 1800); }
+}
+
+// === LOGIC ===
+function isGraduated(ex) {
+const h = state.sessions[ex.id] || [];
+if (h.length < 2) return false;
+return h.slice(0, 2).every(s => s.values.length === ex.sets && s.values.every(v => v >= ex.target));
+}
+function getProgress(ex) {
+const h = state.sessions[ex.id] || [];
+if (h.length === 0) return 0;
+const avg = h[0].values.reduce((a,b) => a+b, 0) / h[0].values.length;
+return Math.min(100, Math.round((avg / ex.target) * 100));
+}
+function logSession(id, values) {
+if (!state.sessions[id]) state.sessions[id] = [];
+state.sessions[id] = [{ date: Date.now(), values }, ...state.sessions[id]].slice(0, 10);
+saveData();
+state.loggingId = null;
+render();
+}
+
+// === ICONS ===
+const I = {
+play: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+trophy: '<svg class="icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+flame: '<svg class="icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+reset: '<svg class="icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
+download: '<svg class="icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+upload: '<svg class="icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+x: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+check: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+copy: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+chevron: '<svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+};
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// === RENDER ===
+function render() {
+const el = document.getElementById('app');
+const totalGrad = EXERCISES.filter(isGraduated).length;
+const overallPct = Math.round((totalGrad / EXERCISES.length) * 100);
+
+el.innerHTML = `
+<header class="header">
+<div class="header-glow"></div>
+<div class="grade-tag">◆ GRADE IV · FOUNDATION</div>
+<h1 class="title display">ANIME PHYSIQUE<br/>TRACKER</h1>
+<div class="stats-row">
+<div>
+<div class="progress-num display">${totalGrad}<span>/${EXERCISES.length}</span></div>
+<div class="progress-label">EXERCISES GRADUATED</div>
+</div>
+<div class="header-actions">
+<button class="icon-btn" onclick="A.modal('import')">${I.upload} restore</button>
+<button class="icon-btn primary" onclick="A.modal('export')">${I.download} backup</button>
+<button class="icon-btn" onclick="A.modal('reset')">${I.reset} reset</button>
+</div>
+</div>
+<div class="progress-bar"><div class="progress-fill" style="width: ${overallPct}%"></div></div>
+<div id="save-status" class="save-status">● SAVED LOCALLY</div>
+</header>
+
+<div class="tabs">
+${[1,2,3].map(d => {
+const dayEx = EXERCISES.filter(e => e.day === d);
+const grad = dayEx.filter(isGraduated).length;
+return `<button class="tab ${state.activeDay === d ? 'active' : ''}" onclick="A.setDay(${d})">
+<div class="tab-day">DAY ${d}</div>
+<div class="tab-title display">${DAY_META[d].title}</div>
+<div class="tab-progress">${grad}/${dayEx.length}</div>
+</button>`;
+}).join('')}
+</div>
+
+<div class="exercises">
+<p class="day-subtitle">${DAY_META[state.activeDay].subtitle.toUpperCase()}</p>
+${EXERCISES.filter(e => e.day === state.activeDay).map(renderCard).join('')}
+</div>
+
+<footer class="footer">
+<p>Hit target on every set, two sessions in a row<br/><span class="highlight">→ exercise graduates to Grade III</span></p>
+<p style="margin-top: 8px; opacity: 0.6;">Add to home screen for app-like access · Data saved on this device</p>
+</footer>
+
+${renderModal()}
+`;
+}
+
+function renderCard(ex) {
+const history = state.sessions[ex.id] || [];
+const graduated = isGraduated(ex);
+const progress = getProgress(ex);
+const unit = ex.type === 'time' ? 's' : '';
+const isLogging = state.loggingId === ex.id;
+const showHist = state.historyOpen[ex.id];
+
+return `
+<div class="card ${graduated ? 'graduated' : ''}">
+<div class="card-header">
+<div style="flex: 1; min-width: 0;">
+<div class="card-title-row">
+<h3 class="card-title">${escapeHtml(ex.name)}</h3>
+${graduated ? `<span class="grad-badge">${I.trophy} CLEARED</span>` : ''}
+</div>
+<p class="card-target">Target · <span>${ex.target}${unit} × ${ex.sets} sets</span></p>
+</div>
+<a class="play-btn" href="vnd.youtube://${VIDEO_ID}?t=${ex.timestamp}" aria-label="Watch demo">${I.play}</a>
+</div>
+<div class="card-progress-row">
+<div class="card-progress-bar"><div class="card-progress-fill" style="width: ${progress}%"></div></div>
+<span class="progress-pct">${progress}%</span>
+</div>
+${history.length > 0 ? `
+<button class="history-toggle icon-btn" onclick="A.toggleHist('${ex.id}')">
+<span>RECENT · ${history.length}</span>
+<span style="transform: rotate(${showHist ? 180 : 0}deg); transition: transform .2s; display: inline-flex;">${I.chevron}</span>
+</button>
+${showHist ? `<div class="history-items">${history.slice(0,5).map(s => {
+const allHit = s.values.every(v => v >= ex.target) && s.values.length === ex.sets;
+const d = new Date(s.date);
+return `<div class="history-item ${allHit ? 'hit' : ''}"><span>${d.toLocaleDateString(undefined, {month:'short',day:'numeric'})}</span><span>${s.values.map(v => v + unit).join(' · ')}</span></div>`;
+}).join('')}</div>` : ''}
+` : ''}
+${graduated ? `
+<div class="grad-callout">
+<div class="grad-callout-tag">${I.flame} READY · LEVEL UP</div>
+<div class="grad-callout-text">Swap to <strong>${escapeHtml(ex.next)}</strong></div>
+</div>
+` : isLogging ? `
+<div class="log-form">
+<div class="log-form-header">
+<span class="log-form-label">ENTER ${ex.type === 'time' ? 'SECONDS' : 'REPS'} PER SET</span>
+<button class="log-close" onclick="A.cancelLog()">${I.x}</button>
+</div>
+<div class="log-inputs" style="grid-template-columns: repeat(${ex.sets}, 1fr);">
+${Array.from({length: ex.sets}).map((_, i) => `
+<div class="log-input-wrap">
+<span class="log-input-label">SET ${i+1}</span>
+<input class="log-input" id="log-${ex.id}-${i}" type="number" inputmode="numeric" placeholder="—" oninput="A.checkReady('${ex.id}', ${ex.sets})"/>
+</div>
+`).join('')}
+</div>
+<button class="save-btn" id="save-${ex.id}" disabled onclick="A.submit('${ex.id}', ${ex.sets})">${I.check} Save session</button>
+</div>
+` : `<button class="log-btn" onclick="A.startLog('${ex.id}')">+ Log session</button>`}
+</div>
+`;
+}
+
+function renderModal() {
+if (!state.modal) return '';
+if (state.modal === 'reset') {
+return `<div class="modal-bg" onclick="A.closeModal()"><div class="modal" onclick="event.stopPropagation()">
+<div class="modal-header"><h3 class="modal-title display">RESET ALL DATA?</h3><button class="modal-close" onclick="A.closeModal()">${I.x}</button></div>
+<p class="modal-text">All logged sessions will be permanently deleted.</p>
+<div class="modal-actions">
+<button class="modal-btn secondary" onclick="A.closeModal()">Cancel</button>
+<button class="modal-btn danger" onclick="A.doReset()">Reset</button>
+</div>
+</div></div>`;
+}
+if (state.modal === 'export') {
+const code = JSON.stringify(state.sessions);
+return `<div class="modal-bg" onclick="A.closeModal()"><div class="modal" onclick="event.stopPropagation()">
+<div class="modal-header"><h3 class="modal-title display">BACKUP CODE</h3><button class="modal-close" onclick="A.closeModal()">${I.x}</button></div>
+<p class="modal-text">Optional safety net. Copy this and save in Notes/email — restore anytime if you lose the file or switch phones.</p>
+<textarea readonly class="modal-textarea" id="export-text" onclick="this.select()">${escapeHtml(code)}</textarea>
+<button class="modal-btn primary" style="margin-top: 12px;" id="copy-btn" onclick="A.copyCode()">${I.copy} Copy to clipboard</button>
+</div></div>`;
+}
+if (state.modal === 'import') {
+return `<div class="modal-bg" onclick="A.closeModal()"><div class="modal" onclick="event.stopPropagation()">
+<div class="modal-header"><h3 class="modal-title display">RESTORE BACKUP</h3><button class="modal-close" onclick="A.closeModal()">${I.x}</button></div>
+<p class="modal-text">Paste a backup code from before. <span class="danger">This replaces current data.</span></p>
+<textarea class="modal-textarea" id="import-text" placeholder='{"plank-d1":[...]}' oninput="state.importText=this.value"></textarea>
+${state.importError ? `<p class="modal-error">${escapeHtml(state.importError)}</p>` : ''}
+<button class="modal-btn primary" style="margin-top: 12px;" onclick="A.doImport()">${I.upload} Restore data</button>
+</div></div>`;
+}
+}
+
+// === ACTIONS ===
+const A = {
+setDay(d) { state.activeDay = d; state.loggingId = null; render(); },
+startLog(id) { state.loggingId = id; render(); setTimeout(() => document.getElementById(`log-${id}-0`)?.focus(), 50); },
+cancelLog() { state.loggingId = null; render(); },
+toggleHist(id) { state.historyOpen[id] = !state.historyOpen[id]; render(); },
+checkReady(id, sets) {
+const btn = document.getElementById(`save-${id}`);
+for (let i = 0; i < sets; i++) {
+const v = document.getElementById(`log-${id}-${i}`).value;
+if (v === '' || isNaN(parseInt(v,10)) || parseInt(v,10) < 0) { btn.disabled = true; return; }
+}
+btn.disabled = false;
+},
+submit(id, sets) {
+const values = [];
+for (let i = 0; i < sets; i++) {
+const v = parseInt(document.getElementById(`log-${id}-${i}`).value, 10);
+if (!Number.isFinite(v) || v < 0) return;
+values.push(v);
+}
+logSession(id, values);
+},
+modal(name) { state.modal = name; state.importError = ''; state.importText = ''; render(); },
+closeModal() { state.modal = null; render(); },
+doReset() { state.sessions = {}; saveData(); state.modal = null; render(); },
+async copyCode() {
+const code = JSON.stringify(state.sessions);
+const btn = document.getElementById('copy-btn');
+try {
+await navigator.clipboard.writeText(code);
+btn.innerHTML = `${I.check} Copied!`;
+setTimeout(() => { if (btn) btn.innerHTML = `${I.copy} Copy to clipboard`; }, 1800);
+} catch {
+const ta = document.getElementById('export-text');
+ta.select(); ta.setSelectionRange(0, 99999);
+try { document.execCommand('copy'); btn.innerHTML = `${I.check} Copied!`; }
+catch { btn.innerHTML = 'Long-press the box to copy'; }
+}
+},
+doImport() {
+const txt = (document.getElementById('import-text')?.value || '').trim();
+if (!txt) { state.importError = 'Paste your backup code first'; render(); return; }
+try {
+const parsed = JSON.parse(txt);
+if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error();
+state.sessions = parsed;
+saveData();
+state.modal = null; state.importError = '';
+render();
+} catch {
+state.importError = "Couldn't read that — make sure you copied the whole thing";
+render();
+}
+},
+};
+
+// === INIT ===
+loadData();
+render();
+</script>
+</body>
+</html>
